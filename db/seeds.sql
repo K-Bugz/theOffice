@@ -1,26 +1,28 @@
 SELECT * FROM department; 
-SELECT * FROM role;
-SELECT * FROM employee;
+SELECT * FROM roles;
+SELECT * FROM employees;
 
-INSERT INTO department(name)
+INSERT INTO department(department_name)
 VALUES ("Bears"),("Colts"),("Bills"),("Vikings");
 
-INSERT INTO role(title, salary, department_id)
+INSERT INTO roles(title, salary, department_id)
         VALUES
-        ("Line Backer",20,1)
-        ("Defensive Lineman",45,2)
-        ("Defensive Back", 12, 3)
+        ("Line Backer",20,1),
+        ("Defensive Lineman",45,2),
+        ("Defensive Back", 12, 3),
         ("Running Back", 19, 4);
 
 /* update managers */
-INSERT INTO employee(first_name, last_name, role_id, manager_id)
+INSERT INTO employees(first_name, last_name, roles_id, manager_id)
         VALUES
-        ("Brian", "Urlacher",1, 2),
-        ("Walter", "Payton",2, 1),
-        ("Dick", "Butkus",1, 1),
-        ("Charles", "Tillman",3, 2),
-        ("Julius", "Peppers",2, 3),
-        ("Mike", "Brown",3, 2),
-        ("Lance", "Briggs",2, 2),
-        ("Tommie", "Harris",2, 2)
+        ("Brian", "Urlacher",1,null),
+        ("Walter", "Payton",2,1),
+        ("Dick", "Butkus",1,null),
+        ("Charles", "Tillman",3,null),
+        ("Julius", "Peppers",2,null),
+        ("Mike", "Brown",3,4),
+        ("Lance", "Briggs",2,null),
+        ("Tommie", "Harris",2,null)
         ;
+
+ 

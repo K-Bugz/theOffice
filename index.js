@@ -1,87 +1,54 @@
-const db = require('./db/connection');
-const inquirer = require('inquirer');
-const mysql = require('mysql');
-const express = require('express');
-const { connection } = require('./db');
+const db = require('./db/connection'); // pulling in connection
+const inquirer = require('inquirer'); // Allows me to ask questions usiong inquirer
+// const { connection } = require('./db'); 
 
 // Add the follwoing below later in version 2.0
 // const logo = require('asciiart-logo');
 // const gradient = require('gradient-string');
 
-db.connect(async function () {
+db.connect(function (err) { // once I connect to the db then I call the init(). 
+    if (err) {
+        console.log("Yep, an error. ")
+        console.log(err)
+    }
+    console.log("CONNECTED!")
     init();
 });
 
+function Quit() { // EndGame function
+    console.log("Goodbye! (in AOL mail voice!)");
+    process.exit();
+}
 
-// Think about moving inquierer methods to another page to clean up index.js
-// Make sure these methods are foisted to the top so they run properly
-function init() {  // The function to initialize it all and ask user what they desire. 
-    inquirer.prompt([
-        {
-            type: 'list',
-            name: 'choice',
-            message: 'Select an option.',
-            choices: [
-                'View Employees',
-                'View Roles',
-                'View Departments',
-                'Add New Employee',
-                'Exit'
-            ],
-        }])
-        .then((answer) => {
+
+function viewEmployees() { // Looks at all employees
+    const request = "SELECT * FROM employees";
+    db.query(request, function (err, res) {
+        if (err) throw err;
+        console.log("Viewing All Employees");
+        console.table(res);
+        inquirer.prompt([
+            {
+                type: 'list',
+                name: 'choice',
+                message: 'select an option.',
+                choices: [
+                    'Main Menu',
+                    'Exit'
+                ],
+            }
+        ]).then((answer) => {
             switch (answer.choice) {
-                case 'View Employees':
-                    viewEmployees(); break;
-                case 'View Roles':
-                    viewRoles(); break;
-                case 'View Departments':
-                    viewDepartments(); break;
-                case 'Add New Employee':
-                    newEmployee(); break;
+                case 'Main Menu':
+                    init();
+                    break;
                 case 'Exit':
                     Quit();
-                    break;
             }
         })
+        // init();
+    })
 };
-
-
-async function viewEmployees() {
-    const employees = await db.getEmployees();
-
-    console.log("\n");
-    console.table(employees);
-    return this.data.query('SELECT * FROM employee');
-};
-// function viewEmployees() { // Looks at all employees
-//     const request = "SELECT * FROM employees";
-//     db.query(request, function (err, res) {
-//         if (err) throw err;
-//         console.log("Viewing All Employees");
-//         console.table(res);
-//         inquirer.prompt([
-//             {
-//                 type: 'list',
-//                 name: 'choice',
-//                 message: 'select an option.',
-//                 choices: [
-//                     'Main Menu',
-//                     'Exit'
-//                 ],
-//             }
-//         ]).then((answer) => {
-//             switch (answer.choice) {
-//                 case 'Main Menu':
-//                     init();
-//                     break;
-//                 case 'Exit':
-//                     Quit();
-//             }
-//         })
-//         // init();
-//     })
-// };
 
 
 function viewDepartments() { // Get db deaprtment data
@@ -104,7 +71,7 @@ function viewDepartments() { // Get db deaprtment data
             .then((answer) => {
                 switch (answer.choice) {
                     case 'Main Menu':
-                        start();
+                        init();
                         break;
                     case 'Exit':
                         Quit();
@@ -177,9 +144,39 @@ function newEmployee() {
 };
 
 
-
-function Quit() { // EndGame function
-    console.log("Goodbye! (in AOL mail voice!)");
-    process.exit();
-
-}
+// Think about moving inquierer methods to another page to clean up index.js
+// Make sure these methods are hoisted to the top so they run properly
+function init() {  // The function to initialize it all and ask user what they desire. 
+    inquirer.prompt([
+        {
+            type: 'list',
+            name: 'choice',
+            message: 'Select an option.',
+            choices: [
+                'View Employees',
+                'View Roles',
+                'View Departments',
+                'Add New Employee',
+                'Exit'
+            ],
+        }])
+        .then((answer) => {
+            switch (answer.choice) {
+                case 'View Employees':
+                    viewEmployees();
+                    break;
+                case 'View Roles':
+                    viewRoles();
+                    break;
+                case 'View Departments':
+                    viewDepartments();
+                    break;
+                case 'Add New Employee':
+                    newEmployee();
+                    break;
+                case 'Exit':
+                    Quit();
+                    break;
+            }
+        })
+};

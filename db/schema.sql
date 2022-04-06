@@ -29,3 +29,14 @@ manager_id INT,
 PRIMARY KEY(id),
 FOREIGN KEY(manager_id) REFERENCES employees (id)
 );
+ 
+
+CREATE TABLE employees(
+id INT AUTO_INCREMENT,
+first_name VARCHAR(25),
+last_name VARCHAR(25),
+roles_id INT,
+manager_id INT,
+PRIMARY KEY(id),
+FOREIGN KEY(manager_id) REFERENCES employees (id)
+);
