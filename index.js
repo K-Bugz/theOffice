@@ -20,9 +20,9 @@ db.connect(function (err) { // once I connect to the db then I call the init().
     init();
 });
 
-function Quit() { // EndGame function! THANOS CLICK!
+function quit() { // EndGame function! THANOS CLICK!
     console.log(gradient('white', 'pink')("Goodbye! (in AOL mail voice!)"));
-    process.exit();
+    process.exit(); // quite the whole thing. 
 }
 
 // I'd like to add the role_name to this display. 
@@ -48,7 +48,7 @@ function viewEmployees() { // Looks at all employees
                     init();
                     break;
                 case 'Exit':
-                    Quit();
+                    quit();
             }
         })
     })
@@ -79,11 +79,17 @@ function viewRoles() { // Get db deaprtment data
                         init();
                         break;
                     case 'Exit':
-                        Quit();
+                        quit();
                 }
             })
     })
 };
+
+
+/*  proc_parameter:
+    [ IN | OUT | INOUT ] param_name type 
+*/
+
 
 function viewDepartments() { // Get db deaprtment data
     const request = "SELECT * FROM department";
@@ -108,7 +114,7 @@ function viewDepartments() { // Get db deaprtment data
                         init();
                         break;
                     case 'Exit':
-                        Quit();
+                        quit();
                 }
             })
     })
@@ -163,14 +169,13 @@ function newEmployee() {
                             init();
                             break;
                         case 'Exit':
-                            Quit();
+                            quit();
                     }
                 })
             }
             )
         })
 };
-
 
 // Adds new roles or positions
 function newRoles() {
@@ -189,6 +194,52 @@ function newRoles() {
         // title
         .then(function (res) { // Insert user-input values into db
             const crit = [res.position, res.salary];
+            const sql = 'INSERT INTO roles(title, salary) VALUES (?,?)';
+            db.query(sql, crit, function (err, response) {
+                if (err) throw err;
+                console.table(response);
+                inquirer.prompt([
+                    {
+                        type: 'list',
+                        name: 'choice',
+                        message: 'select an option.',
+                        choices: [
+                            'Main Menu',
+                            'Exit'
+                        ]
+                    }
+                ]).then((answer) => {
+                    switch (answer.choice) {
+                        case 'Main Menu':
+                            init();
+                            break;
+                        case 'Exit':
+                            Quit();
+                    }
+                })
+            }
+            )
+        })
+};
+
+
+// Adds new roles Polymorphed!
+function newRoles(data) {
+    inquirer.prompt([ // Get values from user
+        {
+            type: 'input',
+            message: 'Enter a new position name.',
+            name: 'position'
+        },
+        {
+            type: 'input',
+            message: 'Enter the players salary.',
+            name: 'salary'
+        }
+    ])
+        // title
+        .then(function (res) { // Insert user-input values into db
+            const crit = [data.position, res.salary];
             const sql = 'INSERT INTO roles(title, salary) VALUES (?,?)';
             db.query(sql, crit, function (err, response) {
                 if (err) throw err;
@@ -251,7 +302,7 @@ function newDepartments() {
                             init();
                             break;
                         case 'Exit':
-                            Quit();
+                            quit();
                     }
                 })
             }
@@ -260,63 +311,44 @@ function newDepartments() {
 };
 
 
+
+/* FROM RESOURCES
+function (err, response) {
+*/
+
+// This was a great example of writing the functions in a different order and how scope of the db really matters. function (err, response) {
 // Update the employee role or position
-function updateEmployeeRole() {
-    inquirer.prompt([ // Get values from user
-        {
-            name: 'chosenEmployee',
-            type: 'list',
-            message: 'Which employee has a new role?',
-            choices: rolesArray
-        },
-        {
-            type: 'input',
-            message: "What is the player's new position?",
-            name: 'position'
-        },
-        {
-            type: 'input',
-            message: "What is the player's new salary?",
-            name: 'salary'
-        }
-    ])
-        // title
-        .then(function (res) { // Insert user-input values into db
-            const crit = [res.position, res.salary];
-            const sql = 'INSERT INTO roles(title, salary) VALUES (?,?)';
-            db.query(sql, crit, function (err, response) {
-                if (err) throw err;
-                // for each roles in resonse or db, then 
-                response.forEach((roles) => { roleArray.push(role.title); });
-                console.table(response);
-                inquirer.prompt([
-                    {
-                        type: 'list',
-                        name: 'choice',
-                        message: 'select an option.',
-                        choices: [
-                            'Main Menu',
-                            'Exit'
-                        ]
-                    }
-                ]).then((answer) => {
+function updateEmployeeRole() { // I'd like to pass an object of the DB but, I just called the db first then pushed onto the array so I can you it in inquier
+    db.query(response => {
+        response.forEach((roles) => { rolesArray.push(roles.title); });
+    })
+        .then(res1 => { // Need to inquirer now that I got the different choices from db
+            inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'choice',
+                    message: 'select an option.',
+                    choices: res1
+                }
+            ])
+                .then(res2 => newRoles(res2))
+                .then(answer => {
                     switch (answer.choice) {
                         case 'Main Menu':
                             init();
                             break;
                         case 'Exit':
-                            Quit();
+                            quit();
                     }
                 })
-            }
-            )
+
         })
-}
+};
 
 // Think about moving inquierer methods to another page to clean up index.js
 // Make sure these methods are hoisted to the top so they run properly
 function init() {  // The function to initialize it all and ask user what they desire. 
-    const text = logo({ name: "The-Office" }).render();
+    const text = logo({ name: "The-League" }).render();
     console.log(gradient('bold-green', 'blue', 'pink')(text));
     // console.log(text);
     inquirer.prompt([
@@ -331,7 +363,7 @@ function init() {  // The function to initialize it all and ask user what they d
                 'Add New Players',
                 'Add Positions',
                 'Add Teams',
-                'update Employee Role',
+                'Update the PLayers Position',
                 'Exit'
             ],
         }])
@@ -352,16 +384,19 @@ function init() {  // The function to initialize it all and ask user what they d
                     newEmployee();
                     break;
                 case 'Add Positions':
-                    newRoles();
+                    newRoles("useless passing variable");
                     break;
                 case 'Add Teams':
                     newDepartments();
                     break;
-                case 'update Employee Role':
+                case 'Update the PLayers Position':
+                    if (rolesArray) {
+                        updateEmployeeRole(rolesArray);
+                    }
                     updateEmployeeRole();
                     break;
                 case 'Exit':
-                    Quit();
+                    quit();
                     break;
             }
         })
