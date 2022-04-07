@@ -6,9 +6,14 @@ class DB { // Create a DB object w/ the following methods
     }
 
     // could place methods here. 
-    findAllEmployees() {
-        return this.connection.query('SELECT * FROM employee.employees');
+    findAllEmployees1() {
+        return connection.query('SELECT * FROM employees');
     }
+    // Add employee 
+    addEmployee(employee) {
+        return this.connection.query('INSERT INTO employees SET ?', employee);
+    }
+
 }
 
 // Creating a new instance of the DB class. Then call the connection. 

@@ -5,7 +5,6 @@ USE empTracker;
 
 CREATE TABLE department(
     id INT AUTO_INCREMENT,
-    roles_id INT,
     department_name VARCHAR(25) NOT NULL,
     PRIMARY KEY (id)
 );
@@ -29,14 +28,7 @@ manager_id INT,
 PRIMARY KEY(id),
 FOREIGN KEY(manager_id) REFERENCES employees (id)
 );
- 
 
-CREATE TABLE employees(
-id INT AUTO_INCREMENT,
-first_name VARCHAR(25),
-last_name VARCHAR(25),
-roles_id INT,
-manager_id INT,
-PRIMARY KEY(id),
-FOREIGN KEY(manager_id) REFERENCES employees (id)
-);
+
+/* FROM employees JOIN roles ON employees.roles_id = roles.title; */
+  -- Defines relationship between two tables --
